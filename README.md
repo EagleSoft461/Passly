@@ -17,12 +17,13 @@ Most backend developers only ever integrate an OAuth2 **client** (e.g. "Sign in 
 
 ## Architecture
 
-![Passly Component Architecture](./docs/adr/images/passly-component-diagram.svg)
+![Passly Component Architecture](https://github.com/EagleSoft461/Passly/blob/main/docs/images/passly-component-diagram.svg)
+![Passly Sequence Architecture](https://github.com/EagleSoft461/Passly/blob/main/docs/images/passly-sequence-diagram.svg)
 
-Full design decisions and rationale: [`docs/adr/ADR-001-passly-oauth2-auth-server.md`](./docs/adr/ADR-001-passly-oauth2-auth-server.md)
+Full design decisions and rationale: [`docs/adr/ADR-001-passly-oauth2-auth-server.md`](https://github.com/EagleSoft461/Passly/blob/main/docs/adr/adr-001-oauth2-auth-server.md)
 
-- [Entity Design](./docs/entity-design.md)
-- [API Contract](./docs/api-contract.md)
+- [Entity Design](https://github.com/EagleSoft461/Passly/blob/main/docs/passly-entity-design.md)
+- [API Contract](https://github.com/EagleSoft461/Passly/blob/main/docs/passly-api-contract.md)
 - [Roadmap](./ROADMAP.md)
   **Note on OIDC:** v1 implements the OAuth2 Authorization Code + PKCE flow and issues JWT access tokens. Full OpenID Connect (`/.well-known/openid-configuration` discovery, ID Tokens, `/userinfo`, `nonce` validation) is a Future Consideration, not yet implemented — see [`ROADMAP.md`](./ROADMAP.md) for what's in v1 versus deferred.
 
