@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="100%" height="100%" style="background-color: #fcfcfc; font-family: sans-serif;">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+    <marker id="dashed-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#999"/>
+    </marker>
+  </defs>
+
+  <text x="550" y="40" font-size="24" font-weight="bold" text-anchor="middle" fill="#111">Passly — Component Architecture (v1)</text>
+  <text x="550" y="62" font-size="13" text-anchor="middle" fill="#777">Shows components and their relationships — see sequence diagram for step-by-step flow</text>
+
+  <!-- Google / GitHub -->
+  <rect x="50" y="100" width="220" height="90" rx="10" fill="#f0f7ff" stroke="#3b82f6" stroke-width="2"/>
+  <text x="160" y="140" font-size="16" font-weight="bold" text-anchor="middle" fill="#1e3a8a">Google / GitHub</text>
+  <text x="160" y="165" font-size="14" text-anchor="middle" fill="#475569">(External Identity Provider)</text>
+
+  <!-- Client -->
+  <rect x="800" y="100" width="220" height="90" rx="10" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
+  <text x="910" y="140" font-size="16" font-weight="bold" text-anchor="middle" fill="#581c87">Client</text>
+  <text x="910" y="165" font-size="14" text-anchor="middle" fill="#475569">(Postman / future demo)</text>
+
+  <!-- Auth Server (Passly) -->
+  <rect x="250" y="300" width="380" height="150" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="3"/>
+  <text x="440" y="330" font-size="18" font-weight="bold" text-anchor="middle" fill="#166534">auth-server (Passly)</text>
+  <line x1="270" y1="345" x2="610" y2="345" stroke="#22c55e" stroke-width="1"/>
+
+  <text x="270" y="370" font-size="14" font-weight="bold" fill="#15803d">Endpoints:</text>
+  <text x="270" y="395" font-size="13" fill="#166534">/oauth2/authorize</text>
+  <text x="270" y="415" font-size="13" fill="#166534">/oauth2/token</text>
+  <text x="270" y="435" font-size="13" fill="#166534">/.well-known/jwks.json</text>
+
+  <text x="440" y="370" font-size="14" font-weight="bold" fill="#15803d">Responsibilities:</text>
+  <text x="440" y="395" font-size="13" fill="#166534">Validate state + PKCE</text>
+  <text x="440" y="415" font-size="13" fill="#166534">Resolve/create user</text>
+  <text x="440" y="435" font-size="13" fill="#166534">Issue access + refresh token</text>
+
+  <!-- Resource Server -->
+  <rect x="750" y="300" width="280" height="150" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+  <text x="890" y="330" font-size="16" font-weight="bold" text-anchor="middle" fill="#991b1b">resource-server</text>
+  <line x1="770" y1="345" x2="1010" y2="345" stroke="#ef4444" stroke-width="1"/>
+  <text x="890" y="375" font-size="13" text-anchor="middle" fill="#7f1d1d">Fetches + caches JWKS</text>
+  <text x="890" y="400" font-size="13" text-anchor="middle" fill="#7f1d1d">Validates JWT locally</text>
+  <text x="890" y="425" font-size="13" text-anchor="middle" fill="#7f1d1d">No per-request call to auth</text>
+
+  <!-- Redis -->
+  <rect x="100" y="560" width="220" height="100" rx="10" fill="#fff1f2" stroke="#e11d48" stroke-width="2"/>
+  <text x="210" y="595" font-size="16" font-weight="bold" text-anchor="middle" fill="#be123c">Redis (In-Memory)</text>
+  <text x="210" y="620" font-size="13" text-anchor="middle" fill="#881337">State &amp; PKCE Challenge</text>
+  <text x="210" y="640" font-size="13" font-weight="bold" text-anchor="middle" fill="#881337">(TTL: 5 Minutes)</text>
+
+  <!-- PostgreSQL -->
+  <rect x="420" y="560" width="280" height="110" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="2"/>
+  <text x="560" y="595" font-size="16" font-weight="bold" text-anchor="middle" fill="#9a3412">PostgreSQL</text>
+  <text x="560" y="620" font-size="13" text-anchor="middle" fill="#7c2d12">users, clients, linked_accounts</text>
+  <text x="560" y="640" font-size="13" font-weight="bold" text-anchor="middle" fill="#7c2d12">refresh_tokens (revoked_at)</text>
+  <text x="560" y="660" font-size="12" font-style="italic" text-anchor="middle" fill="#9a3412">Owned solely by auth-server</text>
+
+  <!-- CONNECTIONS: simple, no step numbers -->
+  <path d="M 800 145 C 650 160, 550 220, 460 295" fill="transparent" stroke="#555" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="540" y="215" font-size="12.5" fill="#555">authorize / token exchange</text>
+
+  <path d="M 910 190 L 890 295" fill="transparent" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="915" y="245" font-size="12.5" fill="#555">API request + access_token</text>
+
+  <path d="M 270 300 C 220 260, 180 220, 160 195" fill="transparent" stroke="#555" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="100" y="245" font-size="12.5" fill="#555">delegated auth</text>
+
+  <line x1="380" y1="450" x2="280" y2="555" stroke="#555" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+  <text x="345" y="525" font-size="12.5" fill="#555" transform="rotate(-36 345,525)">state / PKCE R-W</text>
+
+  <line x1="520" y1="450" x2="540" y2="555" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="545" y="520" font-size="12.5" fill="#555">create / revoke</text>
+
+  <line x1="750" y1="375" x2="635" y2="375" stroke="#999" stroke-width="2" stroke-dasharray="6,6" marker-end="url(#dashed-arrow)"/>
+  <text x="650" y="365" font-size="12.5" fill="#777">fetch JWKS (cached)</text>
+
+  <!-- Legend -->
+  <text x="50" y="700" font-size="13" fill="#555" font-weight="bold" transform="translate(0,-15)">Legend:</text>
+</svg>

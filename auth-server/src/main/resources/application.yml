@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: passly-auth-server
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/${POSTGRES_DB:passly}
+    username: ${POSTGRES_USER:passly}
+    password: ${POSTGRES_PASSWORD:change-me}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+server:
+  port: 9000
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+passly:
+  oauth:
+    google:
+      client-id: ${GOOGLE_CLIENT_ID:default-client-id}
+      client-secret: ${GOOGLE_CLIENT_SECRET:default-secret}
+      redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:9000/login/oauth2/code/google}
+      scopes: "openid email profile"
