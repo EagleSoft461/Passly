@@ -1,0 +1,7 @@
+passly:
+  oauth:
+    google:
+      client-id: test-google-client-id
+      client-secret: test-google-secret
+      redirect-uri: http://localhost:9000/login/oauth2/code/google
+      scopes: "openid email profile"

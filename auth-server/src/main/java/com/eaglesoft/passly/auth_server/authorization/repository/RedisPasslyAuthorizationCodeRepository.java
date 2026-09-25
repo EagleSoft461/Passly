@@ -1,7 +1,7 @@
 package com.eaglesoft.passly.auth_server.authorization.repository;
 
 import com.eaglesoft.passly.auth_server.authorization.model.PasslyAuthorizationCode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -19,10 +19,14 @@ public class RedisPasslyAuthorizationCodeRepository implements PasslyAuthorizati
     private static final Duration TTL = Duration.ofMinutes(2);
 
     private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public RedisPasslyAuthorizationCodeRepository(StringRedisTemplate redisTemplate) {
+    public RedisPasslyAuthorizationCodeRepository(
+            StringRedisTemplate redisTemplate,
+            ObjectMapper objectMapper
+    ) {
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @Override

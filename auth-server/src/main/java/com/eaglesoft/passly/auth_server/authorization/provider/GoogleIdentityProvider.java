@@ -34,8 +34,6 @@ public class GoogleIdentityProvider implements IdentityProvider {
                 .queryParam("redirect_uri", properties.redirectUri())
                 .queryParam("scope", properties.scopes())
                 .queryParam("state", request.state())
-                .queryParam("code_challenge", request.codeChallenge())
-                .queryParam("code_challenge_method", request.codeChallengeMethod())
                 .build()
                 .encode()
                 .toUriString();

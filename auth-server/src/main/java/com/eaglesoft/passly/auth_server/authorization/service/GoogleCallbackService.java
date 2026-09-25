@@ -13,6 +13,7 @@ import com.eaglesoft.passly.auth_server.domain.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -73,7 +74,7 @@ public class GoogleCallbackService {
         ExternalUserInfo externalUserInfo = retriever.retrieveUserInfo(tokenResponse.accessToken());
 
         // Step 3: Link or create user account
-        LinkedAccount.Provider provider = LinkedAccount.Provider.valueOf(authRequest.provider());
+        LinkedAccount.Provider provider = LinkedAccount.Provider.valueOf(authRequest.provider().toUpperCase(Locale.ROOT));
         User user = accountLinkingService.linkOrCreateUser(provider, externalUserInfo);
 
         // Step 4: Issue Passly authorization code

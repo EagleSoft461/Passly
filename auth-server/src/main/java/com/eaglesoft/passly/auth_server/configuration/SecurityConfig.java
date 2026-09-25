@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/login/oauth2/code/google").permitAll()
                         // RFC 7517 §5 — JWKS public key set
                         .requestMatchers("/.well-known/jwks.json").permitAll()
+                        .requestMatchers("/error").permitAll()
                         // All other paths are protected (safe default)
                         .anyRequest().authenticated()
                 );

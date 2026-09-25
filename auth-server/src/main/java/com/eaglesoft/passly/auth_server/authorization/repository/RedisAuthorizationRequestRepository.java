@@ -1,7 +1,7 @@
 package com.eaglesoft.passly.auth_server.authorization.repository;
 
 import com.eaglesoft.passly.auth_server.authorization.model.AuthorizationRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -12,38 +12,56 @@ import java.util.Optional;
 public class RedisAuthorizationRequestRepository implements AuthorizationRequestRepository {
 
     private static final String KEY_PREFIX = "passly:oauth:authorization:";
-    private static final Duration TTL = Duration.ofMinutes(5); // Decision 7
+    private static final Duration TTL = Duration.ofMinutes(5);
 
     private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    // Bilinçli olarak Spring'in global JSON mapper'ından (Jackson 3'e geçti,
-    // Spring Boot 4) bağımsız tutuyoruz — bu, Redis'teki iç saklama formatımız,
-    // uygulamanın dışa açık HTTP JSON sözleşmesiyle ilgisi yok.
+    private final ObjectMapper objectMapper;
 
-    public RedisAuthorizationRequestRepository(StringRedisTemplate redisTemplate) {
+    public RedisAuthorizationRequestRepository(
+            StringRedisTemplate redisTemplate,
+            ObjectMapper objectMapper
+    ) {
         this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public void save(AuthorizationRequest request) {
         try {
             String json = objectMapper.writeValueAsString(request);
-            redisTemplate.opsForValue().set(key(request.state()), json, TTL);
+
+            redisTemplate.opsForValue()
+                    .set(key(request.state()), json, TTL);
+
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to serialize AuthorizationRequest", e);
+            throw new IllegalStateException(
+                    "Failed to serialize AuthorizationRequest",
+                    e
+            );
         }
     }
 
     @Override
     public Optional<AuthorizationRequest> consume(String state) {
-        String json = redisTemplate.opsForValue().getAndDelete(key(state));
+        String json = redisTemplate.opsForValue()
+                .getAndDelete(key(state));
+
         if (json == null) {
             return Optional.empty();
         }
+
         try {
-            return Optional.of(objectMapper.readValue(json, AuthorizationRequest.class));
+            return Optional.of(
+                    objectMapper.readValue(
+                            json,
+                            AuthorizationRequest.class
+                    )
+            );
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to deserialize AuthorizationRequest", e);
+            throw new IllegalStateException(
+                    "Failed to deserialize AuthorizationRequest",
+                    e
+            );
         }
     }
 

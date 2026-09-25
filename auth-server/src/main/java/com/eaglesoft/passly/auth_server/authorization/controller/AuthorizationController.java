@@ -33,14 +33,19 @@ public class AuthorizationController {
 
     @GetMapping("/oauth2/authorize")
     public ResponseEntity<Void> authorize(
-            @RequestParam("client_id")             String clientId,
-            @RequestParam("response_type")         String responseType,
-            @RequestParam("redirect_uri")          String redirectUri,
-            @RequestParam("state")                 String state,
-            @RequestParam("code_challenge")        String codeChallenge,
+            @RequestParam("client_id") String clientId,
+            @RequestParam("response_type") String responseType,
+            @RequestParam("redirect_uri") String redirectUri,
+            @RequestParam("state") String state,
+            @RequestParam("code_challenge") String codeChallenge,
             @RequestParam("code_challenge_method") String codeChallengeMethod,
-            @RequestParam("provider")              String provider
+            @RequestParam("provider") String provider
     ) {
+
+        System.err.println(
+                "========== AUTHORIZE CONTROLLER ENTERED =========="
+        );
+
         AuthorizeCommand command = new AuthorizeCommand(
                 clientId,
                 responseType,
@@ -51,11 +56,40 @@ public class AuthorizationController {
                 provider
         );
 
-        AuthorizationResult result = authorizationService.authorize(command);
+        System.err.println(
+                "========== COMMAND CREATED =========="
+        );
 
-        return ResponseEntity
-                .status(302)
-                .location(URI.create(result.redirectUrl()))
-                .build();
+        try {
+            System.err.println(
+                    "========== CALLING AUTHORIZATION SERVICE =========="
+            );
+
+            AuthorizationResult result =
+                    authorizationService.authorize(command);
+
+            System.err.println(
+                    "========== SERVICE RETURNED =========="
+            );
+
+            System.err.println(
+                    "Redirect URL: " + result.redirectUrl()
+            );
+
+            return ResponseEntity
+                    .status(302)
+                    .location(URI.create(result.redirectUrl()))
+                    .build();
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "========== EXCEPTION IN CONTROLLER =========="
+            );
+
+            e.printStackTrace();
+
+            throw e;
+        }
     }
 }

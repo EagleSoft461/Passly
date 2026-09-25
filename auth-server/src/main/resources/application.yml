@@ -1,4 +1,7 @@
 spring:
+  config:
+    import: optional:file:../.env[.properties]
+
   application:
     name: passly-auth-server
 
@@ -24,11 +27,11 @@ spring:
 server:
   port: 9000
 
-logging:
-  level:
-    org.springframework.security: DEBUG
-
 passly:
+  security:
+    signing-key:
+      directory: ${PASSLY_SIGNING_KEY_DIRECTORY:./data/signing-key}
+      
   oauth:
     google:
       client-id: ${GOOGLE_CLIENT_ID:default-client-id}

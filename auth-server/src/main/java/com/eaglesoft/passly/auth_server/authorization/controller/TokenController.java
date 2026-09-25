@@ -3,6 +3,7 @@ package com.eaglesoft.passly.auth_server.authorization.controller;
 import com.eaglesoft.passly.auth_server.authorization.model.TokenRequest;
 import com.eaglesoft.passly.auth_server.authorization.model.TokenResponse;
 import com.eaglesoft.passly.auth_server.authorization.service.TokenService;
+import com.eaglesoft.passly.auth_server.authorization.service.RefreshTokenService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +36,14 @@ public class TokenController {
 
     private final TokenService tokenService;
 
-    public TokenController(TokenService tokenService) {
+    private final RefreshTokenService refreshTokenService;
+
+    public TokenController(
+        TokenService tokenService,
+        RefreshTokenService refreshTokenService
+    ) {
         this.tokenService = tokenService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     /**
@@ -81,5 +88,16 @@ public class TokenController {
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
                 .header("Pragma", "no-cache")
                 .body(response);
+    }
+        @PostMapping(
+                value = "/oauth2/revoke",
+                consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    public ResponseEntity<Void> revoke(
+            @RequestParam("token") String token
+    ) {
+        refreshTokenService.revoke(token);
+
+        return ResponseEntity.ok().build();
     }
 }

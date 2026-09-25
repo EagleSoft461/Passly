@@ -1,0 +1,9 @@
+server:
+  port: 8080
+
+passly:
+  authorization-uri: http://localhost:9000/oauth2/authorize
+  token-uri: http://localhost:9000/oauth2/token
+  jwk-set-uri: http://localhost:9000/.well-known/jwks.json
+  client-id: passly-demo-client
+  redirect-uri: http://localhost:8080/login/oauth2/code/passly-demo

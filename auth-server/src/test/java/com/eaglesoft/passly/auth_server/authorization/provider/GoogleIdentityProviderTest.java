@@ -47,9 +47,7 @@ class GoogleIdentityProviderTest {
         assertThat(queryParams.getFirst("redirect_uri")).isEqualTo("http://localhost:9000/callback/google");
         assertThat(queryParams.getFirst("scope")).isEqualTo("openid%20email%20profile");
 
-        // Ensure state and PKCE are sourced from the request
+        // Ensure state is sourced from the request
         assertThat(queryParams.getFirst("state")).isEqualTo("test-state-123!@%23");
-        assertThat(queryParams.getFirst("code_challenge")).isEqualTo("challenge-abc");
-        assertThat(queryParams.getFirst("code_challenge_method")).isEqualTo("S256");
     }
 }
