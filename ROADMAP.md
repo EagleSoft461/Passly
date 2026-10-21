@@ -2,13 +2,13 @@
 
 Passly is developed incrementally, with each release representing a meaningful milestone in the evolution of the authorization platform.
 
-**Status legend:** ✅ Done · 🚧 In Progress · ⬜ Planned · 🔮 Future Consideration
+**Status legend:** ✅ Done · 🚧 In Progress · 📦 Pre-released · ⬜ Planned · 🔮 Future Consideration
 
 ---
 
 ## Current Status
 
-**Current release:** `v0.1.0` — Authorization Server Foundation 🚧
+**Current release:** `v0.1.0` — Authorization Server Foundation 📦
 
 The core authorization-server foundation is implemented. The project is currently moving toward resource-server integration, integration testing, security hardening, and a complete self-hosted developer experience.
 
@@ -16,7 +16,7 @@ The core authorization-server foundation is implemented. The project is currentl
 
 # Release v0.1.0 — Authorization Server Foundation
 
-**Status: 🚧 In Progress**
+**Status: 📦 Pre-released**
 
 The first milestone establishes the core OAuth 2.x authorization-server capabilities.
 
@@ -82,40 +82,42 @@ The first milestone establishes the core OAuth 2.x authorization-server capabili
 * ✅ Docker Compose foundation
 * ✅ PostgreSQL + Redis local infrastructure
 * ✅ Seed OAuth client configuration
-* ⬜ Finalize environment configuration
-* ⬜ Finalize local development setup
+* ✅ Finalize environment configuration
+* ✅ Finalize local development setup
 
 ### Remaining v0.1.0 Work
 
-* ⬜ `/oauth2/revoke`
-* ⬜ Complete release documentation
-* ⬜ Validate the complete local OAuth flow
+* ✅ `/oauth2/revoke`
+* ✅ Complete release documentation
+* ✅ Validate the complete local OAuth flow
 
 ---
 
 # Release v0.2.0 — Resource Server
 
-**Status: ⬜ Planned**
+**Status: ✅ Completed**
 
 The second milestone introduces a reference resource server capable of consuming and validating tokens issued by Passly.
 
 ### Resource Server
 
-* ⬜ Resource-server project scaffold
-* ⬜ JWT resource-server configuration
-* ⬜ JWKS discovery
-* ⬜ JWKS caching
-* ⬜ Local JWT signature validation
-* ⬜ Issuer validation
-* ⬜ Audience validation
-* ⬜ Expiration validation
-* ⬜ Example protected endpoint: `/api/me`
+* ✅ Resource-server project scaffold
+* ✅ JWT resource-server configuration
+* ⬜ JWKS discovery (deferred to OIDC milestone; v0.2.0 architecture uses explicit `jwk-set-uri` configuration)
+* ✅ JWKS endpoint configuration
+* ✅ JWKS caching
+* ✅ Local JWT signature validation
+* ✅ Issuer validation
+* ✅ Audience validation
+* ✅ Expiration validation
+* ✅ Example protected endpoint: `/api/userinfo`
+* ✅ Example protected endpoint: `/api/me`
 
 ### Architecture Validation
 
-* ⬜ Validate auth-server → resource-server trust model
-* ⬜ Verify that resource requests require no callback to Passly
-* ⬜ Document token validation architecture
+* ✅ Validate auth-server → resource-server trust model
+* ✅ Verify that resource requests require no callback to Passly
+* ✅ Document token validation architecture ([docs/token-validation-architecture.md](./docs/token-validation-architecture.md))
 
 ---
 

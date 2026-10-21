@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: passly-resource-server
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9000/.well-known/jwks.json
+
+passly:
+  security:
+    jwt:
+      issuer: https://passly.local
+      audience: passly-demo-client
+
+server:
+  port: 8081
