@@ -5,8 +5,10 @@ import com.eaglesoft.passly.auth_server.authorization.exception.InvalidRedirectU
 import com.eaglesoft.passly.auth_server.domain.OAuthClient;
 import com.eaglesoft.passly.auth_server.repository.OAuthClientRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class OAuthClientServiceImpl implements OAuthClientService {
 
     private final OAuthClientRepository repository;

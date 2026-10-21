@@ -189,6 +189,83 @@ class AuthorizationServiceImplTest {
     }
 
     @Test
+    void shouldAcceptSingleAllowedScope() {
+        OAuthClient client = new OAuthClient("passly-demo-client", "hash", "Demo",
+                List.of("http://localhost:8080/login/oauth2/code/passly-demo"),
+                List.of("openid", "profile"));
+        when(oAuthClientService.validateClientAndRedirectUri(any(), any())).thenReturn(client);
+        when(identityProviderResolver.resolve(any())).thenReturn(mockProvider);
+
+        AuthorizeCommand command = new AuthorizeCommand(
+                "passly-demo-client", "code", "http://localhost:8080/login/oauth2/code/passly-demo",
+                "state", "challenge", "S256", "GOOGLE", "openid"
+        );
+
+        service.authorize(command);
+
+        verify(authorizationRequestService).save(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().scope()).isEqualTo("openid");
+    }
+
+    @Test
+    void shouldAcceptMultipleAllowedScopes() {
+        OAuthClient client = new OAuthClient("passly-demo-client", "hash", "Demo",
+                List.of("http://localhost:8080/login/oauth2/code/passly-demo"),
+                List.of("openid", "profile", "email"));
+        when(oAuthClientService.validateClientAndRedirectUri(any(), any())).thenReturn(client);
+        when(identityProviderResolver.resolve(any())).thenReturn(mockProvider);
+
+        AuthorizeCommand command = new AuthorizeCommand(
+                "passly-demo-client", "code", "http://localhost:8080/login/oauth2/code/passly-demo",
+                "state", "challenge", "S256", "GOOGLE", "openid profile"
+        );
+
+        service.authorize(command);
+
+        verify(authorizationRequestService).save(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().scope()).isEqualTo("openid profile");
+    }
+
+    @Test
+    void shouldRejectScopeNotAllowedForClient() {
+        OAuthClient client = new OAuthClient("passly-demo-client", "hash", "Demo",
+                List.of("http://localhost:8080/login/oauth2/code/passly-demo"),
+                List.of("openid"));
+        when(oAuthClientService.validateClientAndRedirectUri(any(), any())).thenReturn(client);
+        when(identityProviderResolver.resolve(any())).thenReturn(mockProvider);
+
+        AuthorizeCommand command = new AuthorizeCommand(
+                "passly-demo-client", "code", "http://localhost:8080/login/oauth2/code/passly-demo",
+                "state", "challenge", "S256", "GOOGLE", "admin"
+        );
+
+        assertThatThrownBy(() -> service.authorize(command))
+                .isInstanceOf(com.eaglesoft.passly.auth_server.authorization.exception.InvalidScopeException.class)
+                .hasMessageContaining("Invalid or unauthorized scope requested: admin");
+
+        verifyNoInteractions(authorizationRequestService);
+    }
+
+    @Test
+    void shouldDefaultToRegisteredScopesWhenScopeOmitted() {
+        OAuthClient client = new OAuthClient("passly-demo-client", "hash", "Demo",
+                List.of("http://localhost:8080/login/oauth2/code/passly-demo"),
+                List.of("openid", "profile"));
+        when(oAuthClientService.validateClientAndRedirectUri(any(), any())).thenReturn(client);
+        when(identityProviderResolver.resolve(any())).thenReturn(mockProvider);
+
+        AuthorizeCommand command = new AuthorizeCommand(
+                "passly-demo-client", "code", "http://localhost:8080/login/oauth2/code/passly-demo",
+                "state", "challenge", "S256", "GOOGLE", null // omitted scope
+        );
+
+        service.authorize(command);
+
+        verify(authorizationRequestService).save(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().scope()).isEqualTo("openid profile");
+    }
+
+    @Test
     void shouldPropagateRepositorySaveFailure() {
         when(oAuthClientService.validateClientAndRedirectUri(any(), any())).thenReturn(dummyClient());
         when(identityProviderResolver.resolve(any())).thenReturn(mockProvider);

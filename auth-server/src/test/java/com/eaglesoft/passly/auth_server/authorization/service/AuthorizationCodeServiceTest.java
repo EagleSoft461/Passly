@@ -164,6 +164,31 @@ class AuthorizationCodeServiceTest {
     }
 
     @Test
+    void shouldTransferScopeFromAuthorizationRequestToPasslyAuthorizationCode() {
+        UUID userId = UUID.randomUUID();
+        User user = mock(User.class);
+        when(user.getId()).thenReturn(userId);
+
+        AuthorizationRequest request = new AuthorizationRequest(
+                "state-abc",
+                "my-client",
+                "https://custom.com/redirect",
+                "custom-challenge",
+                "S256",
+                "GOOGLE",
+                "openid profile email",
+                Instant.now().plusSeconds(300)
+        );
+
+        service.issueCode(user, request);
+
+        verify(codeRepository).save(codeCaptor.capture());
+
+        PasslyAuthorizationCode code = codeCaptor.getValue();
+        assertThat(code.scope()).isEqualTo("openid profile email");
+    }
+
+    @Test
     void shouldThrowExceptionWhenRepositorySaveFails() {
         UUID userId = UUID.randomUUID();
         User user = mock(User.class);

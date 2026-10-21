@@ -55,6 +55,8 @@ public class SecurityConfig {
                         .requestMatchers("/oauth2/authorize").permitAll()
                         // RFC 6749 §3.2 — token endpoint
                         .requestMatchers("/oauth2/token").permitAll()
+                        // RFC 7009 — token revocation endpoint
+                        .requestMatchers("/oauth2/revoke").permitAll()
                         // OAuth2 callback from Google (handled by GoogleCallbackController)
                         .requestMatchers("/login/oauth2/code/google").permitAll()
                         // RFC 7517 §5 — JWKS public key set

@@ -135,6 +135,14 @@ public class TokenServiceImpl implements TokenService {
                 authorizationCode.codeChallengeMethod()
         );
 
+        String scopeToGrant = authorizationCode.scope();
+        if (scopeToGrant == null || scopeToGrant.isBlank()) {
+            throw new TokenExchangeException(
+                    "invalid_scope",
+                    "Authorization code has no valid scope assigned"
+            );
+        }
+
         User user = userRepository
                 .findById(authorizationCode.userId())
                 .orElseThrow(() ->
@@ -145,7 +153,7 @@ public class TokenServiceImpl implements TokenService {
                 );
 
         String accessToken =
-                jwtTokenService.createAccessToken(user, client);
+                jwtTokenService.createAccessToken(user, client, scopeToGrant);
 
         String refreshToken =
                 refreshTokenService.create(user, client);
@@ -184,10 +192,18 @@ public class TokenServiceImpl implements TokenService {
                         client
                 );
 
+        String clientScope = (client.getScopes() != null && !client.getScopes().isEmpty())
+                ? String.join(" ", client.getScopes())
+                : null;
+        if (clientScope == null || clientScope.isBlank()) {
+            throw new TokenExchangeException("invalid_scope", "Client has no registered scopes");
+        }
+
         String accessToken =
                 jwtTokenService.createAccessToken(
                         rotated.user(),
-                        client
+                        client,
+                        clientScope
                 );
 
         return new TokenResponse(

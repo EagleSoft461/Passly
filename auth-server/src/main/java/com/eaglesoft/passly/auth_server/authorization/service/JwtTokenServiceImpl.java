@@ -29,7 +29,10 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public String createAccessToken(User user, OAuthClient client) {
+    public String createAccessToken(User user, OAuthClient client, String scope) {
+        if (scope == null || scope.isBlank()) {
+            throw new IllegalArgumentException("Scope cannot be null or blank when generating access token");
+        }
 
         Instant now = Instant.now();
 
@@ -43,7 +46,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 )
                 .jwtID(UUID.randomUUID().toString())
                 .claim("email", user.getEmail())
-                .claim("scope", String.join(" ", client.getScopes()))
+                .claim("scope", scope.trim())
                 .build();
 
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)

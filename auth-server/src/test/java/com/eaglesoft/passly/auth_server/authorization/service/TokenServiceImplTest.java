@@ -96,13 +96,13 @@ class TokenServiceImplTest {
                 "authorization_code", AUTH_CODE, REDIRECT_URI, CLIENT_ID, CODE_VERIFIER_43, null);
 
         PasslyAuthorizationCode passlyCode = new PasslyAuthorizationCode(
-                AUTH_CODE, userId, CLIENT_ID, REDIRECT_URI, CODE_CHALLENGE_43, "S256",
+                AUTH_CODE, userId, CLIENT_ID, REDIRECT_URI, CODE_CHALLENGE_43, "S256", "openid profile",
                 Instant.now(), Instant.now().plusSeconds(120));
 
         when(oauthClientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(activeClient));
         when(authorizationCodeRepository.consume(AUTH_CODE)).thenReturn(Optional.of(passlyCode));
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-        when(jwtTokenService.createAccessToken(testUser, activeClient)).thenReturn("mock-access-token");
+        when(jwtTokenService.createAccessToken(testUser, activeClient, "openid profile")).thenReturn("mock-access-token");
         when(refreshTokenService.create(testUser, activeClient)).thenReturn("mock-refresh-token");
 
         TokenResponse response = tokenService.exchange(request);
@@ -119,13 +119,13 @@ class TokenServiceImplTest {
                 "authorization_code", AUTH_CODE, REDIRECT_URI, CLIENT_ID, CODE_VERIFIER_128, null);
 
         PasslyAuthorizationCode passlyCode = new PasslyAuthorizationCode(
-                AUTH_CODE, userId, CLIENT_ID, REDIRECT_URI, CODE_CHALLENGE_128, "S256",
+                AUTH_CODE, userId, CLIENT_ID, REDIRECT_URI, CODE_CHALLENGE_128, "S256", "openid profile",
                 Instant.now(), Instant.now().plusSeconds(120));
 
         when(oauthClientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(activeClient));
         when(authorizationCodeRepository.consume(AUTH_CODE)).thenReturn(Optional.of(passlyCode));
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-        when(jwtTokenService.createAccessToken(testUser, activeClient)).thenReturn("mock-access-token");
+        when(jwtTokenService.createAccessToken(testUser, activeClient, "openid profile")).thenReturn("mock-access-token");
         when(refreshTokenService.create(testUser, activeClient)).thenReturn("mock-refresh-token");
 
         TokenResponse response = tokenService.exchange(request);
@@ -326,12 +326,54 @@ class TokenServiceImplTest {
 
         when(oauthClientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(activeClient));
         when(refreshTokenService.rotate("valid-refresh-token", activeClient)).thenReturn(rotated);
-        when(jwtTokenService.createAccessToken(testUser, activeClient)).thenReturn("rotated-access-token");
+        when(jwtTokenService.createAccessToken(eq(testUser), eq(activeClient), anyString())).thenReturn("rotated-access-token");
 
         TokenResponse response = tokenService.exchange(request);
 
         assertThat(response.accessToken()).isEqualTo("rotated-access-token");
         assertThat(response.refreshToken()).isEqualTo("new-plain-token");
+    }
+
+    @Test
+    void shouldPassExactCodeScopeToJwtTokenService() {
+        TokenRequest request = new TokenRequest(
+                "authorization_code", AUTH_CODE, REDIRECT_URI, CLIENT_ID, CODE_VERIFIER_43, null);
+
+        PasslyAuthorizationCode passlyCode = new PasslyAuthorizationCode(
+                AUTH_CODE, userId, CLIENT_ID, REDIRECT_URI, CODE_CHALLENGE_43, "S256", "email",
+                Instant.now(), Instant.now().plusSeconds(120));
+
+        when(oauthClientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(activeClient));
+        when(authorizationCodeRepository.consume(AUTH_CODE)).thenReturn(Optional.of(passlyCode));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
+        when(jwtTokenService.createAccessToken(testUser, activeClient, "email")).thenReturn("token-for-email-scope");
+        when(refreshTokenService.create(testUser, activeClient)).thenReturn("mock-refresh-token");
+
+        TokenResponse response = tokenService.exchange(request);
+
+        assertThat(response.accessToken()).isEqualTo("token-for-email-scope");
+        verify(jwtTokenService).createAccessToken(testUser, activeClient, "email");
+    }
+
+    @Test
+    void shouldFailExchangeWhenCodeHasNullOrBlankScope() {
+        TokenRequest request = new TokenRequest(
+                "authorization_code", AUTH_CODE, REDIRECT_URI, CLIENT_ID, CODE_VERIFIER_43, null);
+
+        // Code constructed with legacy/null scope
+        PasslyAuthorizationCode passlyCode = new PasslyAuthorizationCode(
+                AUTH_CODE, userId, CLIENT_ID, REDIRECT_URI, CODE_CHALLENGE_43, "S256", null,
+                Instant.now(), Instant.now().plusSeconds(120));
+
+        when(oauthClientRepository.findById(CLIENT_ID)).thenReturn(Optional.of(activeClient));
+        when(authorizationCodeRepository.consume(AUTH_CODE)).thenReturn(Optional.of(passlyCode));
+
+        assertThatThrownBy(() -> tokenService.exchange(request))
+                .isInstanceOf(TokenExchangeException.class)
+                .hasFieldOrPropertyWithValue("errorCode", "invalid_scope")
+                .hasMessageContaining("Authorization code has no valid scope assigned");
+
+        verifyNoInteractions(userRepository, jwtTokenService, refreshTokenService);
     }
 
     @Test

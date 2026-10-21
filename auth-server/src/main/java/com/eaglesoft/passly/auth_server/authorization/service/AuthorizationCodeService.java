@@ -57,6 +57,7 @@ public class AuthorizationCodeService {
                 authorizationRequest.redirectUri(),
                 authorizationRequest.codeChallenge(),
                 authorizationRequest.codeChallengeMethod(),
+                authorizationRequest.scope(),
                 now,
                 now.plus(CODE_TTL)
         );

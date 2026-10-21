@@ -183,6 +183,21 @@ class AuthorizationControllerTest {
     }
 
     // ---------------------------------------------------------------
+    // 6c. Invalid scope → 400, JSON OAuth error ("invalid_scope")
+    // ---------------------------------------------------------------
+    @Test
+    void invalidScope_returns400JsonError() throws Exception {
+        when(authorizationService.authorize(any()))
+                .thenThrow(new com.eaglesoft.passly.auth_server.authorization.exception.InvalidScopeException("Invalid scope: admin"));
+
+        mockMvc.perform(validRequest().param("scope", "admin"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("invalid_scope"))
+                .andExpect(jsonPath("$.error_description").value("Invalid scope: admin"))
+                .andExpect(header().doesNotExist("Location"));
+    }
+
+    // ---------------------------------------------------------------
     // 7. HTTP query parameters are correctly mapped to AuthorizeCommand
     // ---------------------------------------------------------------
     @Test
@@ -190,7 +205,7 @@ class AuthorizationControllerTest {
         when(authorizationService.authorize(any()))
                 .thenReturn(new AuthorizationResult(STATE, REDIRECT_URL));
 
-        mockMvc.perform(validRequest());
+        mockMvc.perform(validRequest().param("scope", "openid profile"));
 
         ArgumentCaptor<AuthorizeCommand> captor = ArgumentCaptor.forClass(AuthorizeCommand.class);
         verify(authorizationService).authorize(captor.capture());
@@ -203,5 +218,6 @@ class AuthorizationControllerTest {
         assertThat(command.codeChallenge()).isEqualTo(CHALLENGE);
         assertThat(command.codeChallengeMethod()).isEqualTo(METHOD);
         assertThat(command.provider()).isEqualTo(PROVIDER);
+        assertThat(command.scope()).isEqualTo("openid profile");
     }
 }

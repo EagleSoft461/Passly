@@ -12,6 +12,18 @@ public record AuthorizeCommand(
         String state,
         String codeChallenge,
         String codeChallengeMethod,
-        String provider
+        String provider,
+        String scope
 ) {
+    public AuthorizeCommand(
+            String clientId,
+            String responseType,
+            String redirectUri,
+            String state,
+            String codeChallenge,
+            String codeChallengeMethod,
+            String provider
+    ) {
+        this(clientId, responseType, redirectUri, state, codeChallenge, codeChallengeMethod, provider, null);
+    }
 }

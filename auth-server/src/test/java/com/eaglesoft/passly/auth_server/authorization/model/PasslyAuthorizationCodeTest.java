@@ -23,6 +23,7 @@ class PasslyAuthorizationCodeTest {
                 "https://example.com/callback",
                 "challenge123",
                 "S256",
+                "openid profile",
                 now,
                 expiresAt
         );
@@ -33,6 +34,7 @@ class PasslyAuthorizationCodeTest {
         assertThat(code.redirectUri()).isEqualTo("https://example.com/callback");
         assertThat(code.codeChallenge()).isEqualTo("challenge123");
         assertThat(code.codeChallengeMethod()).isEqualTo("S256");
+        assertThat(code.scope()).isEqualTo("openid profile");
         assertThat(code.createdAt()).isEqualTo(now);
         assertThat(code.expiresAt()).isEqualTo(expiresAt);
     }

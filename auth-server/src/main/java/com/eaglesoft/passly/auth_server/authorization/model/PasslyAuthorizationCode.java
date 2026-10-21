@@ -20,6 +20,7 @@ public record PasslyAuthorizationCode(
         String redirectUri,
         String codeChallenge,
         String codeChallengeMethod,
+        String scope,
         Instant createdAt,
         Instant expiresAt
 ) {
@@ -42,6 +43,19 @@ public record PasslyAuthorizationCode(
         if (codeChallengeMethod == null || codeChallengeMethod.isBlank()) {
             throw new IllegalArgumentException("codeChallengeMethod cannot be null");
         }
+    }
+
+    public PasslyAuthorizationCode(
+            String code,
+            UUID userId,
+            String clientId,
+            String redirectUri,
+            String codeChallenge,
+            String codeChallengeMethod,
+            Instant createdAt,
+            Instant expiresAt
+    ) {
+        this(code, userId, clientId, redirectUri, codeChallenge, codeChallengeMethod, null, createdAt, expiresAt);
     }
 
     public boolean isExpired() {

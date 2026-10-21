@@ -109,6 +109,30 @@ class RedisAuthorizationRequestRepositoryTest {
         assertThat(deserialized.expiresAt()).isEqualTo(expiresAt);
     }
 
+    @Test
+    void shouldSerializeAndDeserializeAuthorizationRequestWithScopeField() throws Exception {
+        Instant expiresAt = Instant.now().plus(5, ChronoUnit.MINUTES).truncatedTo(ChronoUnit.MILLIS);
+
+        AuthorizationRequest request = new AuthorizationRequest(
+                STATE,
+                "my-client",
+                "https://client.example.com/callback",
+                "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM",
+                "S256",
+                "google",
+                "openid profile email",
+                expiresAt
+        );
+
+        String json = objectMapper.writeValueAsString(request);
+
+        assertThat(json).contains("openid profile email");
+
+        AuthorizationRequest deserialized = objectMapper.readValue(json, AuthorizationRequest.class);
+
+        assertThat(deserialized.scope()).isEqualTo("openid profile email");
+    }
+
     // -------------------------------------------------------------------------
     // save() — Redis interaction
     // -------------------------------------------------------------------------

@@ -13,14 +13,14 @@ import java.net.URI;
 /**
  * HTTP adapter for the OAuth2 authorization endpoint.
  *
- * Responsibilities (HTTP concerns only):
- *   1. Receive GET /oauth2/authorize
- *   2. Map query parameters → AuthorizeCommand
- *   3. Delegate to AuthorizationService
- *   4. Convert AuthorizationResult into HTTP 302 Found
+ * Responsibilities:
+ * 1. Receive GET /oauth2/authorize.
+ * 2. Map query parameters to AuthorizeCommand.
+ * 3. Delegate authorization to AuthorizationService.
+ * 4. Convert AuthorizationResult into HTTP 302 Found.
  *
- * All validation, business logic, and error semantics live in the
- * service layer and GlobalExceptionHandler respectively.
+ * Validation and business logic belong to the service layer.
+ * Error handling is delegated to the global exception handler.
  */
 @RestController
 public class AuthorizationController {
@@ -39,13 +39,9 @@ public class AuthorizationController {
             @RequestParam("state") String state,
             @RequestParam("code_challenge") String codeChallenge,
             @RequestParam("code_challenge_method") String codeChallengeMethod,
-            @RequestParam("provider") String provider
+            @RequestParam("provider") String provider,
+            @RequestParam(value = "scope", required = false) String scope
     ) {
-
-        System.err.println(
-                "========== AUTHORIZE CONTROLLER ENTERED =========="
-        );
-
         AuthorizeCommand command = new AuthorizeCommand(
                 clientId,
                 responseType,
@@ -53,43 +49,15 @@ public class AuthorizationController {
                 state,
                 codeChallenge,
                 codeChallengeMethod,
-                provider
+                provider,
+                scope
         );
 
-        System.err.println(
-                "========== COMMAND CREATED =========="
-        );
+        AuthorizationResult result = authorizationService.authorize(command);
 
-        try {
-            System.err.println(
-                    "========== CALLING AUTHORIZATION SERVICE =========="
-            );
-
-            AuthorizationResult result =
-                    authorizationService.authorize(command);
-
-            System.err.println(
-                    "========== SERVICE RETURNED =========="
-            );
-
-            System.err.println(
-                    "Redirect URL: " + result.redirectUrl()
-            );
-
-            return ResponseEntity
-                    .status(302)
-                    .location(URI.create(result.redirectUrl()))
-                    .build();
-
-        } catch (Exception e) {
-
-            System.err.println(
-                    "========== EXCEPTION IN CONTROLLER =========="
-            );
-
-            e.printStackTrace();
-
-            throw e;
-        }
+        return ResponseEntity
+                .status(302)
+                .location(URI.create(result.redirectUrl()))
+                .build();
     }
 }

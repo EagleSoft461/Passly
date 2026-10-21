@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.eaglesoft.passly.demo_client.service.ResourceServerClient;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,9 +30,16 @@ public class PasslyOAuthController {
     private final RestClient restClient;
     private final JwtDecoder jwtDecoder;
 
-    public PasslyOAuthController(PasslyProperties properties) {
+    private final ResourceServerClient resourceServerClient;
+
+    public PasslyOAuthController(
+        PasslyProperties properties,
+        ResourceServerClient resourceServerClient
+    ) {
     this.properties = properties;
+    this.resourceServerClient = resourceServerClient;
     this.restClient = RestClient.create();
+    
 
     this.jwtDecoder = NimbusJwtDecoder
             .withJwkSetUri(properties.jwkSetUri())
@@ -115,6 +123,9 @@ public class PasslyOAuthController {
         }
 
         TokenResponse tokenResponse = exchangeCode(code, verifier);
+
+        String userinfo = 
+                resourceServerClient.getUserInfo(tokenResponse.accessToken());
 
         Jwt jwt = jwtDecoder.decode(tokenResponse.accessToken());
 

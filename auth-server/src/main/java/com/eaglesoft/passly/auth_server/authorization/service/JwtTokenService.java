@@ -10,7 +10,8 @@ public interface JwtTokenService {
      *
      * @param user authenticated Passly user
      * @param client OAuth client receiving the token
+     * @param scope validated scope string (space-delimited)
      * @return signed JWT access token
      */
-    String createAccessToken(User user, OAuthClient client);
+    String createAccessToken(User user, OAuthClient client, String scope);
 }
